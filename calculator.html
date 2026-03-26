@@ -3,58 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tractor Calc</title>
-
-<link rel="manifest" href="data:application/json,{
-  'name':'Tractor Calc',
-  'short_name':'Tractor',
-  'start_url':'.',
-  'display':'standalone'
-}">
+<title>Tractor Calc PRO</title>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: sans-serif;
   background: #0f0f0f;
   color: #fff;
-}
-
-.app {
-  max-width: 420px;
-  margin: auto;
   padding: 20px;
 }
-
-h1 {
-  font-size: 22px;
-  margin-bottom: 15px;
-}
+.app { max-width: 420px; margin: auto; }
 
 .card {
   background: #1c1c1e;
-  border-radius: 20px;
   padding: 20px;
+  border-radius: 20px;
   margin-bottom: 15px;
-}
-
-label {
-  font-size: 13px;
-  color: #aaa;
-  margin-top: 10px;
-  display: block;
 }
 
 input, select {
   width: 100%;
   padding: 10px;
-  margin-top: 5px;
+  margin-top: 8px;
   border-radius: 10px;
   border: none;
   background: #2c2c2e;
   color: #fff;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  margin-top: 10px;
   font-size: 16px;
+  cursor: pointer;
+}
+
+.main { background: #30d158; color: #000; }
+.share { background: #0a84ff; }
+
+.toggle-btn {
+  background: #2c2c2e;
+}
+.toggle-btn.active {
+  background: #ff9f0a;
+  color: #000;
 }
 
 .switch {
@@ -65,42 +60,11 @@ input, select {
 
 .switch button {
   flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #2c2c2e;
-  color: #fff;
-  cursor: pointer;
-}
-
-.switch .active {
-  background: #0a84ff;
-}
-
-button.main {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  margin-top: 15px;
-  font-size: 16px;
-  cursor: pointer;
-  background: #30d158;
-  color: #000;
-}
-
-button.share {
-  width: 100%;
-  padding: 12px;
-  border-radius: 14px;
-  border: none;
-  margin-top: 10px;
-  background: #0a84ff;
 }
 
 .result {
   text-align: center;
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .small {
@@ -116,49 +80,67 @@ button.share {
 
 <div class="app">
 
-<h1>🚜 Калькулятор</h1>
-
 <div class="card">
+  <h2>🚜 Калькулятор</h2>
 
-<label>Тип</label>
-<select id="type" onchange="toggleType()">
-  <option value="parnik">Парник</option>
-  <option value="ogorod">Огород</option>
-</select>
-
-<label>Способ ввода</label>
-<div class="switch">
-  <button id="modeSize" class="active" onclick="setMode('size')">Длина × ширина</button>
-  <button id="modeSotki" onclick="setMode('sotki')">Сотки</button>
-</div>
-
-<div id="sizeInputs">
-  <label>Длина (м)</label>
-  <input type="number" id="length" value="25">
-
-  <label>Ширина (м)</label>
-  <input type="number" id="width" value="8">
-</div>
-
-<div id="sotkiInput" style="display:none;">
-  <label>Сотки</label>
-  <input type="number" id="sotki" placeholder="например 5">
-</div>
-
-<div id="parnikBlock">
-  <label>Полоски</label>
-  <input type="number" id="lines" value="1">
-
-  <label>Сложность</label>
-  <select id="difficulty">
-    <option value="1">Лёгкий</option>
-    <option value="1.3">Средний</option>
-    <option value="1.6">Сложный</option>
+  <label>Тип работы</label>
+  <select id="type" onchange="toggleType()">
+    <option value="ogorod">Огород</option>
+    <option value="parnik">Парник</option>
   </select>
-</div>
 
-<button class="main" onclick="calc()">Рассчитать</button>
+  <label>Населённый пункт</label>
+  <select id="city">
+    <option value="5000">Грозный</option>
+    <option value="5000">Гудермес</option>
+    <option value="3500">Курчалой</option>
+    <option value="4000">Шали</option>
+    <option value="3000">Автуры</option>
+    <option value="4000">Джалка</option>
+    <option value="4000">Аргун</option>
+    <option value="6000">Урус-Мартан</option>
+    <option value="8000">Ачхой-Мартан</option>
+    <option value="5000">Старые Атаги</option>
+    <option value="4000">Новые Атаги</option>
+    <option value="4000">Бачи-Юрт</option>
+  </select>
 
+  <label>Способ расчёта</label>
+  <div class="switch">
+    <button id="btnSize" class="toggle-btn active" onclick="setMode('size')">Длина × ширина</button>
+    <button id="btnSotki" class="toggle-btn" onclick="setMode('sotki')">Сотки</button>
+  </div>
+
+  <div id="sizeBlock">
+    <label>Длина (м)</label>
+    <input type="number" id="length">
+
+    <label>Ширина (м)</label>
+    <input type="number" id="width">
+  </div>
+
+  <div id="sotkiBlock" style="display:none;">
+    <label>Сотки</label>
+    <input type="number" id="sotki">
+  </div>
+
+  <!-- Парник -->
+  <div id="parnikBlock" style="display:none;">
+    <label>Полоски</label>
+    <input type="number" id="lines" value="1">
+
+    <label>Сложность</label>
+    <select id="difficulty">
+      <option value="1">Лёгкий</option>
+      <option value="1.3">Средний</option>
+      <option value="1.6">Сложный</option>
+    </select>
+  </div>
+
+  <!-- Заправка -->
+  <button id="fuelBtn" class="toggle-btn" onclick="toggleFuel()">⛽ Заправка</button>
+
+  <button class="main" onclick="calc()">Рассчитать</button>
 </div>
 
 <div class="card">
@@ -172,18 +154,19 @@ button.share {
 
 <script>
 let mode = "size";
+let fuel = false;
 let lastText = "";
 
 function setMode(m) {
   mode = m;
 
-  document.getElementById("sizeInputs").style.display =
+  document.getElementById("sizeBlock").style.display =
     m === "size" ? "block" : "none";
-  document.getElementById("sotkiInput").style.display =
+  document.getElementById("sotkiBlock").style.display =
     m === "sotki" ? "block" : "none";
 
-  document.getElementById("modeSize").classList.toggle("active", m === "size");
-  document.getElementById("modeSotki").classList.toggle("active", m === "sotki");
+  document.getElementById("btnSize").classList.toggle("active", m === "size");
+  document.getElementById("btnSotki").classList.toggle("active", m === "sotki");
 }
 
 function toggleType() {
@@ -192,43 +175,50 @@ function toggleType() {
     type === "parnik" ? "block" : "none";
 }
 
+function toggleFuel() {
+  fuel = !fuel;
+  document.getElementById("fuelBtn").classList.toggle("active", fuel);
+}
+
+function getSotki() {
+  if (mode === "size") {
+    const l = +document.getElementById("length").value || 0;
+    const w = +document.getElementById("width").value || 0;
+    return (l * w) / 100;
+  } else {
+    return +document.getElementById("sotki").value || 0;
+  }
+}
+
 function calc() {
   const type = document.getElementById("type").value;
+  const minPrice = +document.getElementById("city").value;
 
-  let area = 0;
-  let sotki = 0;
-
-  if (mode === "size") {
-    const length = +document.getElementById("length").value || 0;
-    const width = +document.getElementById("width").value || 0;
-    area = length * width;
-    sotki = area / 100;
-  } else {
-    sotki = +document.getElementById("sotki").value || 0;
-    area = sotki * 100;
-  }
-
+  const sotki = getSotki();
   let total = 0;
 
-  if (type === "parnik") {
+  if (type === "ogorod") {
+    if (sotki <= 3) total = minPrice;
+    else total = sotki * 1000;
+  } else {
     const lines = +document.getElementById("lines").value || 1;
     const diff = +document.getElementById("difficulty").value;
 
     const base = 2000;
     const standard = 25 * 8;
+    const area = sotki * 100;
 
     total = base * (area / standard) * diff;
 
     if (total < 2000) total = 2000;
 
     total *= lines;
-
-  } else {
-    if (sotki < 3) total = 2000;
-    else total = sotki * 750;
   }
 
-  const text = `Площадь: ${area.toFixed(1)} м² (${sotki.toFixed(2)} соток)
+  // заправка вручную
+  if (fuel) total += 2000;
+
+  const text = `Сотки: ${sotki.toFixed(2)}
 Стоимость: ${Math.round(total)} руб`;
 
   lastText = text;
