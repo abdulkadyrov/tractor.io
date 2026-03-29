@@ -1,246 +1,934 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tractor Calc PRO</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tractor Calc PRO</title>
 
-<style>
-body {
-  font-family: sans-serif;
-  background: #0f0f0f;
-  color: #fff;
-  padding: 20px;
-}
-.app { max-width: 420px; margin: auto; }
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at top left, #1b9fff 0%, #101016 40%, #050509 100%);
+      --card-bg: rgba(15, 15, 20, 0.92);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --accent: #30d158;
+      --accent-soft: rgba(48, 209, 88, 0.25);
+      --accent-2: #0a84ff;
+      --accent-3: #ff9f0a;
+      --accent-3-soft: rgba(255, 159, 10, 0.2);
+      --text-main: #ffffff;
+      --text-muted: #9ca3af;
+      --input-bg: rgba(22, 24, 34, 0.95);
+      --input-border: rgba(148, 163, 184, 0.35);
+      --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.55);
+      --radius-lg: 22px;
+      --radius-md: 14px;
+      --transition-fast: 0.18s ease-out;
+      --transition-mid: 0.25s ease-out;
+    }
 
-.card {
-  background: #1c1c1e;
-  padding: 20px;
-  border-radius: 20px;
-  margin-bottom: 15px;
-}
+    body.light-theme {
+      --bg-gradient: radial-gradient(circle at top left, #e0f2fe 0%, #f9fafb 40%, #e5e7eb 100%);
+      --card-bg: rgba(255, 255, 255, 0.98);
+      --card-border: rgba(15, 23, 42, 0.06);
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --input-bg: rgba(243, 244, 246, 0.98);
+      --input-border: rgba(148, 163, 184, 0.45);
+      --shadow-soft: 0 18px 35px rgba(15, 23, 42, 0.2);
+    }
 
-input, select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  border-radius: 10px;
-  border: none;
-  background: #2c2c2e;
-  color: #fff;
-}
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-button {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  margin-top: 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: #050509;
+      background-image: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      padding: 20px 12px;
+      transition: background 0.6s ease, color 0.25s ease;
+    }
 
-.main { background: #30d158; color: #000; }
-.share { background: #0a84ff; }
+    .bg-ornament {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
 
-.toggle-btn {
-  background: #2c2c2e;
-}
-.toggle-btn.active {
-  background: #ff9f0a;
-  color: #000;
-}
+    .bg-blob {
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.35;
+      mix-blend-mode: screen;
+      animation: float 12s infinite ease-in-out;
+    }
 
-.switch {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
+    .bg-blob:nth-child(1) {
+      top: -40px;
+      left: -40px;
+      background: #0a84ff;
+      animation-delay: 0s;
+    }
 
-.switch button {
-  flex: 1;
-}
+    .bg-blob:nth-child(2) {
+      bottom: -60px;
+      right: -40px;
+      background: #30d158;
+      animation-delay: 2s;
+    }
 
-.result {
-  text-align: center;
-  font-size: 24px;
-}
+    .bg-blob:nth-child(3) {
+      top: 40%;
+      right: 20%;
+      background: #ff9f0a;
+      animation-delay: 4s;
+    }
 
-.small {
-  text-align: center;
-  font-size: 13px;
-  color: #888;
-  margin-top: 5px;
-}
-</style>
+    @keyframes float {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      50% {
+        transform: translate3d(10px, -18px, 0) scale(1.05);
+      }
+      100% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+    }
+
+    .app {
+      width: 100%;
+      max-width: 440px;
+      margin: auto;
+      position: relative;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding: 4px 2px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 30% 30%, #ffffff 0, #ffd60a 38%, #ff9f0a 70%, #d97706 100%);
+      box-shadow:
+        0 0 0 1px rgba(248, 250, 252, 0.2),
+        0 18px 35px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111827;
+      font-size: 22px;
+      transform-origin: center;
+      animation: logoPulse 3s infinite ease-in-out;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.05) rotate(-1deg); }
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .logo-text h1 {
+      font-size: 20px;
+      margin: 0;
+      letter-spacing: 0.02em;
+    }
+
+    .logo-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .theme-toggle {
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.12), rgba(15, 23, 42, 0.42));
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.4);
+      transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-mid),
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+    }
+
+    .theme-toggle span {
+      font-size: 15px;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 26px rgba(15, 23, 42, 0.55);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.55);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 18px 16px 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at top left, rgba(250, 250, 250, 0.12), transparent 55%);
+      opacity: 0.7;
+      pointer-events: none;
+      mix-blend-mode: soft-light;
+    }
+
+    .card-main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pill {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      background: rgba(15, 23, 42, 0.75);
+      color: var(--text-muted);
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-top: 10px;
+      margin-bottom: 3px;
+      color: var(--text-muted);
+    }
+
+    select,
+    input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border-radius: 12px;
+      border: 1px solid var(--input-border);
+      background: linear-gradient(135deg, var(--input-bg), rgba(15, 23, 42, 0.85));
+      color: var(--text-main);
+      font-size: 14px;
+      outline: none;
+      appearance: none;
+      position: relative;
+      transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast),
+        background var(--transition-fast);
+    }
+
+    select:focus,
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(48, 209, 88, 0.4),
+        0 10px 25px rgba(15, 23, 42, 0.6);
+      transform: translateY(-0.5px);
+      background: linear-gradient(135deg, var(--input-bg), rgba(15, 23, 42, 0.9));
+    }
+
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    .select-wrap {
+      position: relative;
+    }
+
+    .select-wrap::after {
+      content: "▾";
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      transform: translateY(-52%);
+      font-size: 10px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .switch {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chip-btn {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7));
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition:
+        border-color var(--transition-fast),
+        color var(--transition-fast),
+        background var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    .chip-btn span {
+      font-size: 14px;
+    }
+
+    .chip-btn.active {
+      background: radial-gradient(circle at top, var(--accent-soft), rgba(15, 23, 42, 0.9));
+      border-color: var(--accent);
+      color: var(--text-main);
+      box-shadow: 0 12px 26px rgba(34, 197, 94, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .chip-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    .chip-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
+    }
+
+    .toggle-btn-extra {
+      margin-top: 10px;
+      padding: 9px 11px;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8));
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      justify-content: center;
+      transition:
+        border-color var(--transition-fast),
+        background var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    .toggle-btn-extra.active {
+      border-style: solid;
+      border-color: var(--accent-3);
+      background: radial-gradient(circle at top, var(--accent-3-soft), rgba(15, 23, 42, 0.95));
+      color: #fef9c3;
+      box-shadow: 0 12px 26px rgba(245, 158, 11, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .toggle-btn-extra:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(15, 23, 42, 0.6);
+    }
+
+    .toggle-btn-extra:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(15, 23, 42, 0.7);
+    }
+
+    .btn-main {
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: none;
+      background: radial-gradient(circle at top, #22c55e, #16a34a);
+      color: #ecfdf5;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow:
+        0 12px 28px rgba(22, 163, 74, 0.8),
+        0 0 0 1px rgba(187, 247, 208, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        filter var(--transition-fast);
+    }
+
+    .btn-main span {
+      font-size: 18px;
+    }
+
+    .btn-main:hover {
+      transform: translateY(-1.5px);
+      box-shadow:
+        0 18px 40px rgba(22, 163, 74, 0.9),
+        0 0 0 1px rgba(187, 247, 208, 0.16);
+      filter: brightness(1.03);
+    }
+
+    .btn-main:active {
+      transform: translateY(0);
+      box-shadow: 0 10px 24px rgba(22, 163, 74, 0.85);
+      filter: brightness(0.98);
+    }
+
+    .btn-share {
+      width: 100%;
+      margin-top: 10px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(125, 211, 252, 0.5);
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.96));
+      color: #e0f2fe;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background var(--transition-fast),
+        border-color var(--transition-fast);
+    }
+
+    .btn-share span {
+      font-size: 17px;
+    }
+
+    .btn-share:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(8, 47, 73, 0.8);
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.96));
+    }
+
+    .btn-share:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 18px rgba(8, 47, 73, 0.9);
+    }
+
+    .result-wrap {
+      position: relative;
+      z-index: 1;
+    }
+
+    .result {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .result-anim {
+      animation: popIn 0.25s ease-out;
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0.9) translateY(4px);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .result span.currency {
+      font-size: 16px;
+      font-weight: 600;
+      opacity: 0.8;
+    }
+
+    .small {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      white-space: pre-line;
+    }
+
+    .small strong {
+      color: var(--accent-2);
+      font-weight: 600;
+    }
+
+    .tagline {
+      font-size: 11px;
+      text-align: center;
+      margin-top: 10px;
+      color: var(--text-muted);
+    }
+
+    .tagline span {
+      color: var(--accent-3);
+      font-weight: 600;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 16px 10px;
+      }
+
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+      }
+
+      .logo-text h1 {
+        font-size: 18px;
+      }
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="app">
-
-<div class="card">
-  <h2>🚜 Калькулятор</h2>
-
-  <label>Тип работы</label>
-  <select id="type" onchange="toggleType()">
-    <option value="ogorod">Огород</option>
-    <option value="parnik">Парник</option>
-  </select>
-
-  <label>Населённый пункт</label>
-  <select id="city">
-    <option value="5000">Грозный</option>
-    <option value="5000">Гудермес</option>
-    <option value="3500">Курчалой</option>
-    <option value="4000">Шали</option>
-    <option value="3000">Автуры</option>
-    <option value="4000">Джалка</option>
-    <option value="4000">Аргун</option>
-    <option value="6000">Урус-Мартан</option>
-    <option value="8000">Ачхой-Мартан</option>
-    <option value="5000">Старые Атаги</option>
-    <option value="4000">Новые Атаги</option>
-    <option value="4000">Бачи-Юрт</option>
-  </select>
-
-  <label>Способ расчёта</label>
-  <div class="switch">
-    <button id="btnSize" class="toggle-btn active" onclick="setMode('size')">Длина × ширина</button>
-    <button id="btnSotki" class="toggle-btn" onclick="setMode('sotki')">Сотки</button>
+  <div class="bg-ornament">
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
   </div>
 
-  <div id="sizeBlock">
-    <label>Длина (м)</label>
-    <input type="number" id="length">
+  <div class="app">
+    <header class="app-header">
+      <div class="logo-wrap">
+        <div class="logo-icon" id="logoIcon">🚜</div>
+        <div class="logo-text">
+          <h1>Tractor Calc PRO</h1>
+          <div class="logo-sub" id="logoSub">Быстрый расчёт вспашки</div>
+        </div>
+      </div>
+      <button class="theme-toggle" id="themeToggle">
+        <span id="themeEmoji">🌙</span>
+        <span id="themeLabel">Тёмная</span>
+      </button>
+    </header>
 
-    <label>Ширина (м)</label>
-    <input type="number" id="width">
+    <div class="card">
+      <div class="card-main">
+        <div class="card-header">
+          <h2>Калькулятор <span>⚙️</span></h2>
+          <div class="pill" id="modeHint">Режим: Огород • Д × Ш</div>
+        </div>
+
+        <label>Тип работы</label>
+        <div class="select-wrap">
+          <select id="type" onchange="updateHints()">
+            <option value="ogorod">Огород</option>
+            <option value="parnik">Парник</option>
+          </select>
+        </div>
+
+        <label>Населённый пункт</label>
+        <div class="select-wrap">
+          <select id="city" onchange="updateHints()">
+            <option value="mestniy" data-min-price="2000" data-min-sotki="0">
+              Местный
+            </option>
+            <option value="grozny" data-min-price="5000" data-min-sotki="5">
+              Грозный
+            </option>
+            <option value="gudermes" data-min-price="5000" data-min-sotki="5">
+              Гудермес
+            </option>
+            <option value="kurchaloy" data-min-price="3500" data-min-sotki="3.5">
+              Курчалой
+            </option>
+            <option value="shali" data-min-price="4000" data-min-sotki="4">
+              Шали
+            </option>
+            <option value="avtury" data-min-price="3000" data-min-sotki="3">
+              Автуры
+            </option>
+            <option value="djalka" data-min-price="4000" data-min-sotki="4">
+              Джалка
+            </option>
+            <option value="argun" data-min-price="4000" data-min-sotki="4">
+              Аргун
+            </option>
+            <option value="urus-martan" data-min-price="6000" data-min-sotki="6">
+              Урус-Мартан
+            </option>
+            <option value="achkhoi-martan" data-min-price="8000" data-min-sotki="8">
+              Ачхой-Мартан
+            </option>
+            <option value="starye-atagi" data-min-price="5000" data-min-sotki="5">
+              Старые Атаги
+            </option>
+            <option value="novye-atagi" data-min-price="4000" data-min-sotki="4">
+              Новые Атаги
+            </option>
+            <option value="bachi-yurt" data-min-price="4000" data-min-sotki="4">
+              Бачи-Юрт
+            </option>
+          </select>
+        </div>
+
+        <label>Способ расчёта</label>
+        <div class="switch">
+          <button
+            id="btnSize"
+            class="chip-btn active"
+            onclick="setMode('size')"
+            type="button"
+          >
+            <span>📐</span> Длина × ширина
+          </button>
+          <button
+            id="btnSotki"
+            class="chip-btn"
+            onclick="setMode('sotki')"
+            type="button"
+          >
+            <span>📏</span> Сотки
+          </button>
+        </div>
+
+        <div id="sizeBlock">
+          <label>Длина (м)</label>
+          <input
+            type="number"
+            id="length"
+            min="0"
+            placeholder="Например, 25"
+          />
+
+          <label>Ширина (м)</label>
+          <input
+            type="number"
+            id="width"
+            min="0"
+            placeholder="Например, 8"
+          />
+        </div>
+
+        <div id="sotkiBlock" style="display: none">
+          <label>Сотки</label>
+          <input
+            type="number"
+            id="sotki"
+            min="0"
+            step="0.01"
+            placeholder="Например, 6"
+          />
+        </div>
+
+        <button
+          id="fuelBtn"
+          class="toggle-btn-extra"
+          onclick="toggleFuel()"
+          type="button"
+        >
+          <span>⛽</span> Добавить заправку +2000 ₽
+        </button>
+
+        <button class="btn-main" onclick="calc()" type="button">
+          <span>⚡</span> Рассчитать
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="result-wrap">
+        <div class="card-header" style="margin-bottom: 6px;">
+          <h2>Итого <span>💰</span></h2>
+          <div class="pill" id="priceHint">1 сотка = 1000 ₽ (минимум по городу)</div>
+        </div>
+
+        <div class="result" id="result">
+          0 <span class="currency">руб</span>
+        </div>
+        <div class="small" id="details"></div>
+        <button class="btn-share" onclick="share()" type="button">
+          <span>📤</span> Поделиться расчётом
+        </button>
+        <div class="tagline" id="tagline">
+          Точный расчёт <span>за пару секунд</span> — удобно для клиента.
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="sotkiBlock" style="display:none;">
-    <label>Сотки</label>
-    <input type="number" id="sotki">
-  </div>
+  <script>
+    let mode = 'size';
+    let fuel = false;
+    let lastText = '';
+    let theme = 'dark';
 
-  <!-- Парник -->
-  <div id="parnikBlock" style="display:none;">
-    <label>Полоски</label>
-    <input type="number" id="lines" value="1">
+    const modeHintEl = document.getElementById('modeHint');
+    const logoSubEl = document.getElementById('logoSub');
+    const priceHintEl = document.getElementById('priceHint');
+    const taglineEl = document.getElementById('tagline');
+    const resultEl = document.getElementById('result');
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeEmojiEl = document.getElementById('themeEmoji');
+    const themeLabelEl = document.getElementById('themeLabel');
+    const logoIconEl = document.getElementById('logoIcon');
 
-    <label>Сложность</label>
-    <select id="difficulty">
-      <option value="1">Лёгкий</option>
-      <option value="1.3">Средний</option>
-      <option value="1.6">Сложный</option>
-    </select>
-  </div>
+    function updateHints() {
+      const type = document.getElementById('type').value;
+      const citySelect = document.getElementById('city');
+      const cityOption = citySelect.options[citySelect.selectedIndex];
+      const cityName = cityOption.textContent.trim();
+      const minPrice = Number(cityOption.dataset.minPrice || 0);
+      const cityValue = cityOption.value;
+      const isLocal = cityValue === 'mestniy';
 
-  <!-- Заправка -->
-  <button id="fuelBtn" class="toggle-btn" onclick="toggleFuel()">⛽ Заправка</button>
+      if (type === 'ogorod') {
+        logoSubEl.textContent = isLocal
+          ? 'Местный тариф: 750 ₽/сотка, минимум 2000 ₽'
+          : `Огород • ${cityName}`;
+      } else {
+        logoSubEl.textContent = isLocal
+          ? 'Парник (местный): 900 ₽/сотка, минимум 2000 ₽'
+          : `Парник • ${cityName}`;
+      }
 
-  <button class="main" onclick="calc()">Рассчитать</button>
-</div>
+      const modeText = mode === 'size' ? 'Д × Ш' : 'Сотки';
+      const typeLabel = type === 'ogorod' ? 'Огород' : 'Парник';
+      modeHintEl.textContent = `Режим: ${typeLabel} • ${modeText}`;
 
-<div class="card">
-  <div class="result" id="result">0 руб</div>
-  <div class="small" id="details"></div>
+      if (type === 'ogorod') {
+        if (isLocal) {
+          priceHintEl.textContent = `Местный (огород): 1 сотка = 750 ₽, минимум ${minPrice.toLocaleString('ru-RU')} ₽`;
+        } else {
+          priceHintEl.textContent = `${cityName} (огород): 1 сотка = 1000 ₽, минимум ${minPrice.toLocaleString('ru-RU')} ₽`;
+        }
+        taglineEl.innerHTML =
+          'Разный минимум по каждому селу — <span>честный расчёт для клиента</span>.';
+      } else {
+        if (isLocal) {
+          priceHintEl.textContent = `Местный (парник): 1 сотка = 900 ₽, минимум ${minPrice.toLocaleString('ru-RU')} ₽`;
+        } else {
+          priceHintEl.textContent = `${cityName} (парник): 1 сотка = 1200 ₽, минимум ${minPrice.toLocaleString('ru-RU')} ₽`;
+        }
+        taglineEl.innerHTML =
+          'Парник дороже за сотку, но минимум как у огорода — <span>понятный тариф</span>.';
+      }
+    }
 
-  <button class="share" onclick="share()">Поделиться</button>
-</div>
+    function setMode(m) {
+      mode = m;
 
-</div>
+      document.getElementById('sizeBlock').style.display =
+        m === 'size' ? 'block' : 'none';
+      document.getElementById('sotkiBlock').style.display =
+        m === 'sotki' ? 'block' : 'none';
 
-<script>
-let mode = "size";
-let fuel = false;
-let lastText = "";
+      document
+        .getElementById('btnSize')
+        .classList.toggle('active', m === 'size');
+      document
+        .getElementById('btnSotki')
+        .classList.toggle('active', m === 'sotki');
 
-function setMode(m) {
-  mode = m;
+      updateHints();
+    }
 
-  document.getElementById("sizeBlock").style.display =
-    m === "size" ? "block" : "none";
-  document.getElementById("sotkiBlock").style.display =
-    m === "sotki" ? "block" : "none";
+    function toggleFuel() {
+      fuel = !fuel;
+      document
+        .getElementById('fuelBtn')
+        .classList.toggle('active', fuel);
+    }
 
-  document.getElementById("btnSize").classList.toggle("active", m === "size");
-  document.getElementById("btnSotki").classList.toggle("active", m === "sotki");
-}
+    function getSotki() {
+      if (mode === 'size') {
+        const l = +document.getElementById('length').value || 0;
+        const w = +document.getElementById('width').value || 0;
+        return (l * w) / 100;
+      } else {
+        return +document.getElementById('sotki').value || 0;
+      }
+    }
 
-function toggleType() {
-  const type = document.getElementById("type").value;
-  document.getElementById("parnikBlock").style.display =
-    type === "parnik" ? "block" : "none";
-}
+    function animateResult() {
+      resultEl.classList.remove('result-anim');
+      void resultEl.offsetWidth;
+      resultEl.classList.add('result-anim');
+    }
 
-function toggleFuel() {
-  fuel = !fuel;
-  document.getElementById("fuelBtn").classList.toggle("active", fuel);
-}
+    function calc() {
+      const type = document.getElementById('type').value;
+      const citySelect = document.getElementById('city');
+      const cityOption = citySelect.options[citySelect.selectedIndex];
+      const cityName = cityOption.textContent.trim();
+      const cityValue = cityOption.value;
+      const minPrice = Number(cityOption.dataset.minPrice || 0);
 
-function getSotki() {
-  if (mode === "size") {
-    const l = +document.getElementById("length").value || 0;
-    const w = +document.getElementById("width").value || 0;
-    return (l * w) / 100;
-  } else {
-    return +document.getElementById("sotki").value || 0;
-  }
-}
+      const sotki = getSotki();
+      let total = 0;
 
-function calc() {
-  const type = document.getElementById("type").value;
-  const minPrice = +document.getElementById("city").value;
+      if (sotki <= 0) {
+        resultEl.innerHTML = `0 <span class="currency">руб</span>`;
+        document.getElementById('details').innerText =
+          'Укажите площадь (длину и ширину или количество соток).';
+        lastText = '';
+        return;
+      }
 
-  const sotki = getSotki();
-  let total = 0;
+      const isLocal = cityValue === 'mestniy';
 
-  if (type === "ogorod") {
-    if (sotki <= 3) total = minPrice;
-    else total = sotki * 1000;
-  } else {
-    const lines = +document.getElementById("lines").value || 1;
-    const diff = +document.getElementById("difficulty").value;
+      if (type === 'ogorod') {
+        if (isLocal) {
+          const pricePerSotka = 750;
+          total = sotki * pricePerSotka;
+          if (total < 2000) total = 2000;
+        } else {
+          const pricePerSotka = 1000;
+          total = sotki * pricePerSotka;
+          if (total < minPrice) total = minPrice;
+        }
+      } else {
+        // ПАРНИК — та же логика, но дороже за сотку
+        if (isLocal) {
+          const pricePerSotka = 900; // дороже местного огорода
+          total = sotki * pricePerSotka;
+          if (total < 2000) total = 2000; // минимум как у местного
+        } else {
+          const pricePerSotka = 1200; // дороже 1000 для огорода
+          total = sotki * pricePerSotka;
+          if (total < minPrice) total = minPrice; // минимум по городу тот же
+        }
+      }
 
-    const base = 2000;
-    const standard = 25 * 8;
-    const area = sotki * 100;
+      if (fuel) total += 2000;
 
-    total = base * (area / standard) * diff;
+      const rounded = Math.round(total);
 
-    if (total < 2000) total = 2000;
+      resultEl.innerHTML =
+        `${rounded.toLocaleString('ru-RU')} <span class="currency">руб</span>`;
+      animateResult();
 
-    total *= lines;
-  }
+      const fuelText = fuel ? ' + заправка 2000 ₽' : '';
+      let detailsText = `Тип: ${type === 'ogorod' ? 'Огород' : 'Парник'}\n`;
+      detailsText += `Нас. пункт: ${cityName}\n`;
+      detailsText += `Площадь: ${sotki.toFixed(2)} сот.\n`;
+      detailsText += `Итого: ${rounded.toLocaleString('ru-RU')} ₽${fuelText}`;
 
-  // заправка вручную
-  if (fuel) total += 2000;
+      lastText = detailsText;
+      document.getElementById('details').innerText = detailsText;
+    }
 
-  const text = `Сотки: ${sotki.toFixed(2)}
-Стоимость: ${Math.round(total)} руб`;
+    function share() {
+      if (!lastText) {
+        alert('Сначала выполните расчёт.');
+        return;
+      }
 
-  lastText = text;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Расчёт трактора',
+          text: lastText,
+        });
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(lastText);
+        alert('Скопировано в буфер обмена!');
+      } else {
+        alert('Поделиться не удалось: нет поддержки API.');
+      }
+    }
 
-  document.getElementById("result").innerText =
-    Math.round(total) + " руб";
+    function toggleTheme() {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        themeEmojiEl.textContent = '☀️';
+        themeLabelEl.textContent = 'Светлая';
+        logoIconEl.textContent = '🚜';
+      } else {
+        document.body.classList.remove('light-theme');
+        themeEmojiEl.textContent = '🌙';
+        themeLabelEl.textContent = 'Тёмная';
+        logoIconEl.textContent = '🚜';
+      }
+    }
 
-  document.getElementById("details").innerText = text;
-}
+    themeToggleBtn.addEventListener('click', toggleTheme);
 
-function share() {
-  if (navigator.share) {
-    navigator.share({
-      title: "Расчёт трактора",
-      text: lastText
-    });
-  } else {
-    navigator.clipboard.writeText(lastText);
-    alert("Скопировано!");
-  }
-}
-</script>
-
+    setMode('size');
+    updateHints();
+  </script>
 </body>
 </html>
